@@ -1,7 +1,4 @@
-from api import app
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy(app)
+from api import app, db
 
 class TimestampMixin(object):
     created = db.Column(db.DateTime, default=db.func.now())
@@ -30,3 +27,27 @@ class Users(db.Model, CRUD, TimestampMixin):
             'email': self.email
         }
         return obj_d
+
+class Workouts(db.Model, CRUD, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship('Users', backref=db.backref('workouts', lazy='dynamic'))
+
+    def __init__(self, user):
+        self.user = user
+
+    def as_dict(self):
+        obj_d = {
+            'workout_id': self.id,
+            'user_id': self.user_id
+        }
+        return obj_d
+
+# class Lifts(db.Model, CRUD, TimestampMixin):
+#     id = db.Column(db.Integer, primary_key=True)
+#     type = db.Column(db.String(120))
+
+# class Runs(db.Model, CRUD, TimestampMixin):
+#     id = db.Column(db.Integer, primary_key=True)
+#     terrain = db.Column(db.String(120))
+#     distance = db.Column(db.Float)

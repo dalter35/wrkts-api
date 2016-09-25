@@ -1,6 +1,7 @@
 from api import app
+from flask import request
 from flask_restful import reqparse, abort, Api, Resource
-from models import Users
+from models import Users, Workouts
 
 api = Api(app)
 
@@ -14,6 +15,15 @@ class UsersList(Resource):
 		user_email = request.form['email']
 		user = Users(user_email)
 		user.add(user)
-		return request.form['email']
+		return user.as_dict(), 201
+
+class WorkoutsList(Resource):
+	def post(self):
+		user = Users.query.filter_by(id=request.form['user_id']).first_or_404()
+		print user.email + ' added a workout'
+		workout = Workouts(user)
+		workout.add(workout)
+		return workout.as_dict(), 201
 		
 api.add_resource(UsersList, '/users')
+api.add_resource(WorkoutsList, '/workouts')
