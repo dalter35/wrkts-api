@@ -1,7 +1,7 @@
 from api import app
 from flask import request
 from flask_restful import reqparse, abort, Api, Resource
-from models import Users, Workouts
+from models import Users, Workouts, Lifts
 
 api = Api(app)
 
@@ -17,13 +17,18 @@ class UsersList(Resource):
 		user.add(user)
 		return user.as_dict(), 201
 
-class WorkoutsList(Resource):
+class WorkoutsAdd(Resource):
 	def post(self):
 		user = Users.query.filter_by(id=request.form['user_id']).first_or_404()
 		print user.email + ' added a workout'
 		workout = Workouts(user)
 		workout.add(workout)
-		return workout.as_dict(), 201
+		
+		lift_type = request.form['lift_type']
+		lift = Lifts(workout, lift_type)
+		lift.add(lift)
+		return lift.as_dict(), 201
+
 		
 api.add_resource(UsersList, '/users')
-api.add_resource(WorkoutsList, '/workouts')
+api.add_resource(WorkoutsAdd, '/workouts')

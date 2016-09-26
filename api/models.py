@@ -43,9 +43,22 @@ class Workouts(db.Model, CRUD, TimestampMixin):
         }
         return obj_d
 
-# class Lifts(db.Model, CRUD, TimestampMixin):
-#     id = db.Column(db.Integer, primary_key=True)
-#     type = db.Column(db.String(120))
+class Lifts(db.Model, CRUD, TimestampMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(120))
+    workout_id = db.Column(db.Integer, db.ForeignKey('workouts.id'))
+    workout = db.relationship('Workouts', backref=db.backref('lifts', lazy='dynamic'))
+
+    def __init__(self, workout, type):
+        self.workout = workout
+        self.type = type
+
+    def as_dict(self):
+        obj_d = {
+            'workout_id': self.workout_id,
+            'workout_type': self.type
+        }
+        return obj_d
 
 # class Runs(db.Model, CRUD, TimestampMixin):
 #     id = db.Column(db.Integer, primary_key=True)
