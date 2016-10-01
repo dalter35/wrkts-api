@@ -1,4 +1,5 @@
 from api import app, db
+from passlib.apps import custom_app_context as pwd_context
 
 class TimestampMixin(object):
     created = db.Column(db.DateTime, default=db.func.now())
@@ -18,6 +19,13 @@ class CRUD():
 class Users(db.Model, CRUD, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True)
+    password_hash = db.Column(db.String(128))
+
+    def hash_password(self, password):
+        self.password_hash = pwd_context.encrypt(password)
+
+    def verify_password(self, password):
+        return pwd_context.verify(password, self.password_hash)
 
     def __init__(self, email):
         self.email = email

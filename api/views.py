@@ -13,7 +13,9 @@ class UsersList(Resource):
 	def post(self):
 		# print request.form['email']
 		user_email = request.form['email']
+		password = request.form['password']
 		user = Users(user_email)
+		user.hash_password(password)
 		user.add(user)
 		return user.as_dict(), 201
 

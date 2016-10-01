@@ -1,2 +1,4 @@
 from api import app
-# app.run()
+
+# uncomment below line in dev
+app.run(debug=True)
