@@ -1,11 +1,13 @@
-from api import app
-from flask import request, g
+from api import app, ma
+from flask import request, g, jsonify
 from flask_restful import reqparse, abort, Api, Resource
 from flask_httpauth import HTTPBasicAuth
+from marshmallow import fields
 from models import Users, Workouts, Lifts, Runs
 
 api = Api(app)
 auth = HTTPBasicAuth()
+
 
 @auth.verify_password
 def verify_password(username, password):
@@ -64,7 +66,25 @@ class UserWorkouts(Resource):
 
 	def get(self):
 		workouts = Workouts.query.filter_by(user_id=g.user.id).all()
-		return [workout.as_dict() for workout in workouts]
+		workouts_result = workouts_schema.dump(workouts)
+		return jsonify({'user_id': g.user.email, 'workouts':workouts_result.data})
+		# return [workout.as_dict() for workout in workouts]
+
+class RunsSchema(ma.ModelSchema):
+	class Meta:
+		model = Runs
+
+class LiftsSchema(ma.ModelSchema):
+	class Meta:
+		model = Lifts
+
+class WorkoutsSchema(ma.ModelSchema):
+	lifts = fields.Nested(LiftsSchema, many=True)
+	runs = fields.Nested(RunsSchema, many=True)
+	class Meta:
+		model = Workouts
+
+workouts_schema = WorkoutsSchema(many=True)
 
 api.add_resource(UsersList, '/users')
 api.add_resource(AddRuns, '/runs')

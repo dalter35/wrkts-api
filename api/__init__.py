@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
+from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
 
@@ -14,6 +15,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/wrkts'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 db = SQLAlchemy(app)
+ma = Marshmallow(app)
 
 import api.views
 import api.models
